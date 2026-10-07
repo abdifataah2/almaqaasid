@@ -1,0 +1,35 @@
+name: Import Almaqaasid source
+on:
+  push:
+    paths:
+      - .github/workflows/import-almaqaasid.yml
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify and extract project
+        env:
+          EXPECTED_SHA256: ac0042ccabf429faf3626e4b37fdb3154a0b44ad0ad7ba47db96770493baf29e
+        run: |
+          python3 - <<'PYCODE'
+          import hashlib, os, pathlib, zipfile
+          archive = pathlib.Path('almaqaasid-import.zip')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == os.environ['EXPECTED_SHA256']
+          with zipfile.ZipFile(archive) as bundle:
+              for item in bundle.infolist():
+                  path = pathlib.PurePosixPath(item.filename)
+                  assert not path.is_absolute() and '..' not in path.parts
+                  assert not any(p in ('.git', '.github') for p in path.parts)
+              bundle.extractall('.')
+          PYCODE
+      - name: Commit imported files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm almaqaasid-import.zip
+          git add .
+          git commit -m 'Import complete Almaqaasid portal with Vercel routing'
+          git push origin HEAD:main

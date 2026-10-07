@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790678520254,
+      "tag": "0000_teacher_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791023132635,
+      "tag": "0001_teacher_subject_classes",
+      "breakpoints": true
+    }
+  ]
+}
